@@ -1,9 +1,12 @@
 version: '3'
 services:
   agent:
-    image: "datadog/agent:7.29.0"
+    image: "datadog/agent:latest"
     environment:
       - DD_API_KEY
+      - DD_PROFILING_ENABLED=true
+      - DD_PROFILING_EXPERIMENTAL_TIMELINE_ENABLED=true
+      - DD_SITE=us5.datadoghq.com
       - DD_APM_ENABLED=true
       - DD_LOGS_ENABLED=true
       - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
@@ -32,8 +35,6 @@ services:
     image: "ddtraining/discounts:2.1.0"
     ports:
       - "5001:5001"
-    volumes:
-      - "../../discounts-service:/app"
     depends_on:
       - agent
       - db
@@ -78,8 +79,6 @@ services:
     image: "ddtraining/advertisements:2.1.0"
     ports:
       - "5002:5002"
-    volumes:
-      - "../../ads-service:/app"
     depends_on:
       - agent
       - db

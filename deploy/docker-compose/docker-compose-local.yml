@@ -3,9 +3,10 @@
 version: '3'
 services:
   agent:
-    image: "datadog/agent:7.35.0"
+    image: "datadog/agent:latest"
     environment:
       - DD_API_KEY
+      - DD_SITE=us5.datadoghq.com
       - DD_APM_ENABLED=true
       - DD_LOGS_ENABLED=true
       - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
@@ -33,15 +34,12 @@ services:
       - DD_TRACE_ANALYTICS_ENABLED=true
       - DD_PROFILING_ENABLED=true
       - DD_VERSION=1.1
-    build:
-      context: ../../discounts-service-fixed
-      args:
-        DISCOUNTS_PORT: ${DISCOUNTS_PORT}
+    build: ../../discounts-service/
+    command: ddtrace-run flask run --port=5001 --host=0.0.0.0
     volumes:
-      - "../../discounts-service-fixed:/app"
+      - "../../discounts-service:/app"
     ports:
-      - "${DISCOUNTS_PORT}:${DISCOUNTS_PORT}"
-      - "22"
+      - "5001:5001"
     depends_on:
       - agent
       - db
@@ -51,24 +49,17 @@ services:
   frontend:
     environment:
       - DD_AGENT_HOST=agent
+      - DD_SERVICE=store-frontend
       - DD_LOGS_INJECTION=true
       - DD_TRACE_ANALYTICS_ENABLED=true
-      - DD_SERVICE=store-frontend
       - DB_USERNAME
       - DB_PASSWORD
-      - DD_VERSION=1.1
       - DD_CLIENT_TOKEN
       - DD_APPLICATION_ID
       - DD_ENV=development
       - DD_SITE=datadoghq.com
-      - RAILS_HIDE_STACKTRACE=true
-      - ADS_PORT=${ADS_PORT}
-      - DISCOUNTS_PORT=${DISCOUNTS_PORT}
-      - ADS_ROUTE=${ADS_ROUTE}
-      - DISCOUNTS_ROUTE=${DISCOUNTS_ROUTE}
-    image: "public.ecr.aws/x2b9z2t7/ddtraining/storefront-fixed:latest"
-    volumes:
-      - "../../store-frontend/src/store-frontend-instrumented-fixed:/app"
+    image: "ddtraining/storefront-fixed:2.1.0"
+    command: sh docker-entrypoint.sh
     ports:
       - "3000:3000"
     depends_on:
@@ -92,14 +83,12 @@ services:
       - DD_TRACE_ANALYTICS_ENABLED=true
       - DD_PROFILING_ENABLED=true
       - DD_VERSION=1.0
-    build:
-      context: ../../ads-service-fixed
-      args:
-        ADS_PORT: ${ADS_PORT}
+    build: ../../ads-service-fixed
+    command: ddtrace-run flask run --port=5002 --host=0.0.0.0
     volumes:
       - "../../ads-service-fixed:/app"
     ports:
-      - "${ADS_PORT}:${ADS_PORT}"
+      - "5002:5002"
     depends_on:
       - agent
       - db
@@ -114,30 +103,4 @@ services:
       - POSTGRES_USER
     labels:
       com.datadoghq.ad.logs: '[{"source": "postgresql", "service": "postgres"}]'
-  attackbox:
-    build:
-      context: ../../attackbox
-    logging:
-      driver: none # this only works when using docker-compose (vs docker compose)
-    environment:
-      - ATTACK_GOBUSTER
-      - ATTACK_HYDRA
-      - ATTACK_GOBUSTER_INTERVAL
-      - ATTACK_HYDRA_INTERVAL
-      - ATTACK_SSH
-      - ATTACK_SSH_INTERVAL
-      - ATTACK_HOST
-      - ATTACK_PORT
-    depends_on:
-      - discounts
-      - frontend
-  nginx:
-    restart: always
-    build:
-      context: ../../nginx
-    ports:
-      - "80:80"
-    depends_on:
-      - frontend
-    labels:
-      com.datadoghq.ad.logs: '[{"source": "nginx", "service": "nginx"}]'
+ 

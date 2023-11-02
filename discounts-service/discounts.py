@@ -28,6 +28,7 @@ def hello():
 def status():
     if flask_request.method == 'GET':
           discounts = Discount.query.all()
+          #discounts = Discount.query.options(joinedload('*')).all()
           app.logger.info(f"Discounts available: {len(discounts)}")
 
           influencer_count = 0
