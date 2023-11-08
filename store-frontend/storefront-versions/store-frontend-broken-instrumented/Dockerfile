@@ -36,4 +36,5 @@ RUN bundle install && \
 # Force STDOUT logging
 ENV RAILS_LOG_TO_STDOUT=true
 
+
 CMD ["sh", "/opt/storedog/docker-entrypoint.sh"]
