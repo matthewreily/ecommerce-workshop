@@ -11,7 +11,7 @@ services:
       - DD_LOGS_ENABLED=true
       - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
       - DD_PROCESS_AGENT_ENABLED=true
-      - DD_TAGS=env:development,git.repository_url:github.com/matthewreily/ecommerce-workshop,git.commit.sha:fce6c37f6a5a998354961510a0a02809d9db29f8
+      - DD_TAGS=env:development,git.repository_url:github.com/matthewreily/ecommerce-workshop,git.commit.sha:f62e80b007402bfc8cb695e91838a2cda557e345
      
     ports:
       - "8126:8126"
