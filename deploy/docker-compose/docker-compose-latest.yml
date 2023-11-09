@@ -14,13 +14,37 @@ services:
       - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
       - DD_PROCESS_AGENT_ENABLED=true
       - DD_TAGS=env:development,git.repository_url:github.com/matthewreily/ecommerce-workshop,git.commit.sha:${DD_GIT_COMMIT_SHA}
-      - DD_VERSION=1.3
+      - DD_VERSION
+      - DD_SYSTEM_PROBE_SERVICE_MONITORING_ENABLED='true'
     ports:
       - "8126:8126"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /proc/:/host/proc/:ro
       - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - /sys/kernel/debug:/sys/kernel/debug
+      - /lib/modules:/lib/modules
+      - /usr/src:/usr/src
+      - /var/tmp/datadog-agent/system-probe/build:/var/tmp/datadog-agent/system-probe/build
+      - /var/tmp/datadog-agent/system-probe/kernel-headers:/var/tmp/datadog-agent/system-probe/kernel-headers
+      - /etc/apt:/host/etc/apt
+      - /etc/yum.repos.d:/host/etc/yum.repos.d
+      - /etc/zypp:/host/etc/zypp
+      - /etc/pki:/host/etc/pki
+      - /etc/yum/vars:/host/etc/yum/vars
+      - /etc/dnf/vars:/host/etc/dnf/vars
+      - /etc/rhsm:/host/etc/rhsm
+    cap_add:
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - SYS_PTRACE
+      - NET_ADMIN
+      - NET_BROADCAST
+      - NET_RAW
+      - IPC_LOCK
+      - CHOWN
+    security_opt:
+      - apparmor:unconfined
     labels:
       com.datadoghq.ad.logs: '[{"source": "agent", "service": "agent"}]'
   discounts:
@@ -35,6 +59,7 @@ services:
       - DD_LOGS_INJECTION=true
       - DD_TRACE_ANALYTICS_ENABLED=true
       - DD_PROFILING_ENABLED=true
+      - DD_VERSION
     image: public.ecr.aws/x2b9z2t7/ddtraining/discounts-fixed:latest
     command: flask run --port=${DISCOUNTS_PORT} --host=0.0.0.0 # If using any other port besides the default 8282, overriding the CMD is required
     volumes:
@@ -66,6 +91,7 @@ services:
       - ADS_ROUTE=${ADS_ROUTE}
       - DISCOUNTS_ROUTE=${DISCOUNTS_ROUTE}
       - DD_TAGS=env:development,git.repository_url:github.com/matthewreily/ecommerce-workshop,git.commit.sha:${DD_GIT_COMMIT_SHA}
+      - DD_VERSION
     image: public.ecr.aws/x2b9z2t7/ddtraining/storefront:latest
     volumes:
       - "../../store-frontend/src/store-frontend-broken-instrumented:/app"
@@ -91,7 +117,7 @@ services:
       - DD_LOGS_INJECTION=true
       - DD_TRACE_ANALYTICS_ENABLED=true
       - DD_PROFILING_ENABLED=true
-      - DD_VERSION=1.0
+      - DD_VERSION
     image: public.ecr.aws/x2b9z2t7/ddtraining/advertisements-fixed:latest
     command: flask run --port=${ADS_PORT} --host=0.0.0.0 # If using any other port besides the default 9292, overriding the CMD is required
     volumes:
