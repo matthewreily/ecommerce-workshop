@@ -8,8 +8,8 @@
     <%= render partial: 'spree/shared/head' %>
   </head>
   <body class="<%= body_class %>" id="<%= @body_id || 'default' %>" data-hook="body">
+  <br /><center><a href="<%= @ads['url'] %>"><img src="data:image/png;base64,<%= @ads['base64'] %>" /></a></center>
     <%= render partial: 'spree/shared/header' %>
-
     <div class="container">
       <div class="row" data-hook>
         <%= spree_breadcrumbs(@taxon) %>
