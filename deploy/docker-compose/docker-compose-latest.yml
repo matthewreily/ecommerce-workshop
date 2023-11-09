@@ -59,6 +59,7 @@ services:
       - DD_LOGS_INJECTION=true
       - DD_TRACE_ANALYTICS_ENABLED=true
       - DD_PROFILING_ENABLED=true
+      - DD_TAGS=env:development,git.repository_url:github.com/matthewreily/ecommerce-workshop,git.commit.sha:${DD_GIT_COMMIT_SHA}
       - DD_VERSION
     image: public.ecr.aws/x2b9z2t7/ddtraining/discounts-fixed:latest
     command: flask run --port=${DISCOUNTS_PORT} --host=0.0.0.0 # If using any other port besides the default 8282, overriding the CMD is required
@@ -117,6 +118,7 @@ services:
       - DD_LOGS_INJECTION=true
       - DD_TRACE_ANALYTICS_ENABLED=true
       - DD_PROFILING_ENABLED=true
+      - DD_TAGS=env:development,git.repository_url:github.com/matthewreily/ecommerce-workshop,git.commit.sha:${DD_GIT_COMMIT_SHA}
       - DD_VERSION
     image: public.ecr.aws/x2b9z2t7/ddtraining/advertisements-fixed:latest
     command: flask run --port=${ADS_PORT} --host=0.0.0.0 # If using any other port besides the default 9292, overriding the CMD is required
@@ -138,22 +140,6 @@ services:
       - POSTGRES_USER
     labels:
       com.datadoghq.ad.logs: '[{"source": "postgresql", "service": "postgres"}]'
-  attackbox:
-    image: public.ecr.aws/x2b9z2t7/ddtraining/attackbox:latest
-    logging:
-      driver: none # this only works when using docker-compose (vs docker compose)
-    environment:
-      - ATTACK_GOBUSTER
-      - ATTACK_HYDRA
-      - ATTACK_GOBUSTER_INTERVAL
-      - ATTACK_HYDRA_INTERVAL
-      - ATTACK_SSH
-      - ATTACK_SSH_INTERVAL
-      - ATTACK_HOST
-      - ATTACK_PORT
-    depends_on:
-      - discounts
-      - frontend
   nginx:
     restart: always
     image: public.ecr.aws/x2b9z2t7/ddtraining/nginx:latest

@@ -48,6 +48,7 @@ services:
       - DD_LOGS_INJECTION=true
       - DD_TRACE_ANALYTICS_ENABLED=true
       - DD_SERVICE=store-frontend
+      - DD_PROFILING_ENABLED=true
       - DB_USERNAME
       - DB_PASSWORD
       - DD_VERSION=1.1

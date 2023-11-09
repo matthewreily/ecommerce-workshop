@@ -34,7 +34,8 @@ def weighted_image(weight):
 @app.route('/ads', methods=['GET', 'POST'])
 def status():
     if flask_request.method == 'GET':
-
+        #silly me making a divide by zero mistake
+        i = 1 / 0
         try:
             advertisements = Advertisement.query.all()
             app.logger.info(f"Total advertisements available: {len(advertisements)}")
